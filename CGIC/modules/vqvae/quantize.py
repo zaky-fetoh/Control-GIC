@@ -25,7 +25,10 @@ class VectorQuantize2(nn.Module):
         self.embedding = nn.Embedding(n_e, e_dim)
         self.embedding.weight.data.uniform_(-1.0 / n_e, 1.0 / n_e)
 
-        self.embedding_counter = nn.ParameterDict({str(i): nn.Parameter(torch.zeros(1)) for i in range(n_e)}).requires_grad_(False).cuda()
+        # Track how often each embedding index is used; keep on module device (no hard-coded CUDA)
+        self.embedding_counter = nn.ParameterDict({
+            str(i): nn.Parameter(torch.zeros(1), requires_grad=False) for i in range(n_e)
+        })
 
         self.remap = remap
         if self.remap is not None:
